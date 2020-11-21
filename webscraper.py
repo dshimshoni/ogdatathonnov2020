@@ -1,10 +1,11 @@
 # import modules
+import csv
 try: 
     from googlesearch import search 
 except ImportError:  
     print("No module named 'google' found") 
 try:     
-    import pandas
+    import pandas as pd
 except ImportError:
     print("No module named 'pandas' found")
 try:
@@ -34,50 +35,32 @@ data_provided = pd.read_csv('sample.csv')
 website = data_provided['guidestar_url'].values
 
 for i in website:
+    profile = i
+    driver.get(str(profile))
+    try:
+        name = driver.find_element_by_class_name('profile-org-name')
+        year = driver.find_element_by_xpath('/html/body/div[3]/div[10]/div/div[2]/section[1]/p[2]')
+        principle_officer = driver.find_element_by_xpath('/html/body/div[3]/div[10]/div/div[2]/section[2]/p[2]')
 
-    profile = 'https://www.guidestar.org/profile/11-1633549'
-    driver.get(profile)
+        sector_area = driver.find_element_by_xpath("/html/body/div[3]/div[10]/div/div[3]/section[4]/p[2]/span[2]")
+        subject_area = driver.find_element_by_xpath("/html/body/div[@id='mainPageContent']/div[@class='extended-banner bb-gold'][2]/div[@id='summary']/div[@class='col-lg-2'][2]/section[@class='report-section'][2]")
 
-    name = driver.find_element_by_class_name('profile-org-name')
-
-    each = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'report-section')))
-    element = driver.find_elements_by_class_name('report-section')
-
-    for i in element:
-        if i.find_element_by_class_name('report-section-header') == 'Ruling year':
-            value = i.find_element_by_class_name('report-section-text')
-            year = value.get_attribute('p') 
-        elif i.find_element_by_class_name('report-section-header') == 'President' or element.find_element_by_class_class_name('report-section-header') == 'Principle Officer':
-            value = i.find_element_by_class_name('report-section-text')
-            principle_officer = value.get_attribute('p')
-        elif i.find_element_by_class_name('report-section-header') == 'SIC Code':
-            value = i.find_element_by_class_name('report-section-text mb-2')
-            sector_area = value.get_attribute('p')
-        elif i.find_element_by_class_name('report-section-header') == 'Subject area':
-            subject_area = i.find_element_by_class_name('report-section-text mb-2')
-        elif i.find_element_by_class_name('report-section-header') == 'Population served':
-            target_audience = i.find_element_by_class_name('report-section-text mb-2')
+        target_audience = driver.find_element_by_xpath("/html/body/div[@id='mainPageContent']/div[@class='extended-banner bb-gold'][2]/div[@id='summary']/div[@class='col-lg-2'][2]/section[@class='report-section'][3]")
         org_type = 'non_profit'
 
-    mission = driver.find_element_by_id("mission")
-    element = driver.find_element_by_class_name('hide-print-url')
-    website = element.get_attribute('href') # check to see if this get's fucked up
+        mission = driver.find_element_by_xpath("/html/body/div[@id='mainPageContent']/div[@class='extended-banner bb-gold'][2]/div[@id='summary']/div[@class='col-lg-6']/section[@class='report-section border-top-0 border-bottom-0 pt-0']/p[@id='mission-statement']")
 
-    num_employees= driver.find_element_by_id("mission")
-    services= driver.find_element_by_id("mission")
-    description= driver.find_element_by_id("mission")
-    reach= driver.find_element_by_id("mission")
-    org_size= driver.find_element_by_id("mission")
-    size_of_audience= driver.find_element_by_id("mission")
-
-    element = driver.find_element_by_id('keywords')
-    values = element.find_element_by_id('keyword')
-    keywords = values.get_attribute('p')
-
-    all_orgs.append({'name': name, 'year': year, 'principle_officer': principle_officer,
-    'mission': mission, 'subject_area':subject_area, 'sector_area':sector_area, 'website':website, 
-    'num_employees':num_employees, 'org_type':org_type, 'services':services, 'keywords': keywords, 
-    'description':description, 'target_audience':target_audience,
-    'reach':reach, 'org_size':org_size, 'size_of_audience':size_of_audience})
+        website = driver.find_element_by_xpath("/html/body/div[3]/div[7]/div[2]/div/span[3]/a")
 
 
+        services= driver.find_element_by_xpath("/html/body/div[@id='mainPageContent']/div[@id='mission']/div[@class='row']/section[@id='programsAndAreasServed']/div[@class='profile-row']/div[@class='profile-col-6'][1]")
+        keywords = driver.find_element_by_xpath("/html/body/div[@id='mainPageContent']/div[@id='mission']/div[@class='row']/section[@id='programsAndAreasServed']/div[@class='profile-row']/div[@class='profile-col-6'][1]")
+
+        page_info = {'name': name.text, 'year': year.text, 'principle_officer': principle_officer.tex,
+        'mission': mission.tex, 'subject_area':subject_area.text, 'sector_area':sector_area.text, 'website':website.text, 'org_type':org_type, 'services':services.text, 'keywords': keywords.text, 'target_audience':target_audience.text}
+    except:
+        print("Error in webpage", i , "continuing...")
+df = pd.DataFrame(all_orgs)
+compression_opts = dict(method='zip', archive_name='database.csv')  
+
+df.to_csv('database.zip', index=False, compression=compression_opts)
