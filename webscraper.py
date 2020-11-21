@@ -30,9 +30,10 @@ all_orgs = []
 
 # for loop for i in list from df
 # set profile = i
-data_provided = [INSERT DATA FRAME HERE COLUMNS OF WEBSITE]
+data_provided = pd.read_csv('sample.csv')
+website = data_provided['guidestar_url'].values
 
-for i in data_provided:
+for i in website:
 
     profile = 'https://www.guidestar.org/profile/11-1633549'
     driver.get(profile)
